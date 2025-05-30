@@ -1,6 +1,6 @@
 import openai
 
-openai.api_key = "YOUR_OPENAI_API_KEY"
+client = openai.OpenAI(api_key=openai.api_key)
 
 def generate_dispute_letter(account_name, reason):
     prompt = f"""
@@ -14,11 +14,13 @@ def generate_dispute_letter(account_name, reason):
     Reason: {reason}
     Format as a letter for mailing to a credit bureau.
     """
-    response = openai.ChatCompletion.create(
+
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a credit dispute letter writer."},
             {"role": "user", "content": prompt}
         ]
     )
+
     return response.choices[0].message.content
