@@ -4,7 +4,7 @@ import json
 import pandas as pd
 from datetime import datetime
 from extract_pdf import extract_text_from_pdf
-from generate_action_plan import get_dispute_items_with_retry  # <-- updated import
+from generate_action_plan import get_dispute_items_with_retry
 from generate_letter import generate_dispute_letter
 from save_letter_pdf import save_letter_as_pdf
 from send_letter_lob import send_certified_letter
@@ -23,15 +23,23 @@ if uploaded_file:
 
     with st.spinner("Analyzing report and generating dispute plan..."):
         try:
-            items_json = get_dispute_items_with_retry(text)  # <-- uses retry logic
+            items_json = get_dispute_items_with_retry(text)
         except Exception as e:
             st.error(f"❌ Failed to generate dispute plan: {e}")
             st.stop()
 
+    # Attempt to sanitize and parse GPT output
     try:
-        items = json.loads(items_json)
-    except json.JSONDecodeError:
+        # Extract valid JSON if GPT adds extra text
+        json_start = items_json.find('[')
+        json_end = items_json.rfind(']') + 1
+        clean_json = items_json[json_start:json_end]
+
+        items = json.loads(clean_json)
+    except Exception as e:
         st.error("⚠️ Error: Could not understand GPT output. Please check the credit report formatting.")
+        st.text("Raw GPT output:")
+        st.code(items_json, language="json")
         st.stop()
 
     # Step 3: Show each dispute item with a button to send it
@@ -84,4 +92,5 @@ if os.path.exists("disputes.csv"):
         st.dataframe(pd.DataFrame(followups))
     else:
         st.info("✅ No follow-up disputes are due yet.")
+
 
