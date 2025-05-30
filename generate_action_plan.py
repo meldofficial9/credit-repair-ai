@@ -1,6 +1,6 @@
 import openai
 
-openai.api_key = "YOUR_OPENAI_API_KEY"
+client = openai.OpenAI(api_key=openai.api_key)
 
 def get_dispute_items(text):
     prompt = f"""
@@ -19,11 +19,13 @@ def get_dispute_items(text):
     Credit Report:
     {text[:4000]}
     """
-    response = openai.ChatCompletion.create(
+
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a credit dispute specialist."},
             {"role": "user", "content": prompt}
         ]
     )
+
     return response.choices[0].message.content
