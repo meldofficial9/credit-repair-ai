@@ -93,4 +93,16 @@ if os.path.exists("disputes.csv"):
     else:
         st.info("✅ No follow-up disputes are due yet.")
 
+# Step 5: Show dispute history
+st.markdown("---")
+st.subheader("📜 Dispute History")
+
+if os.path.exists("disputes.csv"):
+    df = pd.read_csv("disputes.csv")
+    df["date_sent"] = pd.to_datetime(df["date_sent"])
+    df = df.sort_values(by="date_sent", ascending=False)
+
+    st.dataframe(df[["bureau", "account", "round", "date_sent"]])
+else:
+    st.info("📭 No disputes have been logged yet.")
 
