@@ -1,6 +1,5 @@
-import openai
-
-client = openai.OpenAI(api_key=openai.api_key)
+import time
+from openai.error import RateLimitError
 
 def get_dispute_items(text):
     prompt = f"""
@@ -29,3 +28,17 @@ def get_dispute_items(text):
     )
 
     return response.choices[0].message.content
+
+def get_dispute_items_with_retry(text, retries=3, delay=2):
+    for attempt in range(retries):
+        try:
+            return get_dispute_items(text)
+        except RateLimitError:
+            if attempt < retries - 1:
+                wait_time = delay * (2 ** attempt)  # exponential backoff
+                print(f"Rate limit hit, retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+            else:
+                print("Max retries reached. Raising RateLimitError.")
+                raise
+
