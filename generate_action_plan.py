@@ -1,5 +1,6 @@
+import openai
 import time
-from openai.error import RateLimitError
+from openai import RateLimitError  # ✅ correct import
 
 def get_dispute_items(text):
     prompt = f"""
