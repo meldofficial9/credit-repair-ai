@@ -1,6 +1,10 @@
+import os
 import openai
 import time
-from openai import RateLimitError  # ✅ correct import
+from openai import RateLimitError
+
+# ✅ Define the OpenAI client (new SDK pattern)
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def get_dispute_items(text):
     prompt = f"""
@@ -42,4 +46,5 @@ def get_dispute_items_with_retry(text, retries=3, delay=2):
             else:
                 print("Max retries reached. Raising RateLimitError.")
                 raise
+
 
