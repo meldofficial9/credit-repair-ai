@@ -4,7 +4,7 @@ import json
 import pandas as pd
 from datetime import datetime
 from extract_pdf import extract_text_from_pdf
-from generate_action_plan import get_dispute_items
+from generate_action_plan import get_dispute_items_with_retry  # <-- updated import
 from generate_letter import generate_dispute_letter
 from save_letter_pdf import save_letter_as_pdf
 from send_letter_lob import send_certified_letter
@@ -22,7 +22,11 @@ if uploaded_file:
     st.subheader("📄 AI-Generated Dispute Plan")
 
     with st.spinner("Analyzing report and generating dispute plan..."):
-        items_json = get_dispute_items(text)
+        try:
+            items_json = get_dispute_items_with_retry(text)  # <-- uses retry logic
+        except Exception as e:
+            st.error(f"❌ Failed to generate dispute plan: {e}")
+            st.stop()
 
     try:
         items = json.loads(items_json)
@@ -80,3 +84,4 @@ if os.path.exists("disputes.csv"):
         st.dataframe(pd.DataFrame(followups))
     else:
         st.info("✅ No follow-up disputes are due yet.")
+
