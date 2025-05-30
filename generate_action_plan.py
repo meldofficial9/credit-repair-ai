@@ -2,12 +2,28 @@ import openai
 
 openai.api_key = "YOUR_OPENAI_API_KEY"
 
-def get_action_plan(text):
+def get_dispute_items(text):
+    prompt = f"""
+    Read the following credit report and extract ALL negative items (collections, charge-offs, late payments, etc.).
+    For each one, return:
+    - Bureau (TransUnion, Experian, or Equifax if possible — or just say 'Unknown')
+    - Account name
+    - Suggested dispute reason (keep it simple)
+
+    Format the output as JSON like this:
+    [
+      {{"bureau": "Experian", "account": "Capital One", "reason": "This account is not mine"}},
+      ...
+    ]
+
+    Credit Report:
+    {text[:4000]}
+    """
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are an expert credit repair assistant."},
-            {"role": "user", "content": f"Analyze this credit report and identify collections, charge-offs, late payments, and generate a round 1 dispute plan:\n{text[:4000]}"}
+            {"role": "system", "content": "You are a credit dispute specialist."},
+            {"role": "user", "content": prompt}
         ]
     )
     return response.choices[0].message.content
