@@ -2,7 +2,7 @@ import csv
 import os
 from datetime import datetime, timedelta
 
-# This function will dynamically generate the filename based on username
+# File naming format based on username
 TRACKER_FILE_TEMPLATE = "disputes_{username}.csv"
 
 def get_tracker_file(username):
@@ -40,17 +40,18 @@ def needs_follow_up(username, bureau, account_name):
     if not info:
         return False
     days_since = (datetime.now() - info["date_sent"]).days
-    return days_since >= 30  # Ready for next round
+    return days_since >= 30
 
 def get_all_followups(username):
     tracker_file = get_tracker_file(username)
     if not os.path.exists(tracker_file):
         return []
 
+    followups = []
+    seen = set()
+
     with open(tracker_file, mode="r") as file:
         reader = csv.DictReader(file)
-        seen = set()
-        followups = []
         for row in reader:
             key = (row["bureau"], row["account"])
             if key in seen:
@@ -58,5 +59,6 @@ def get_all_followups(username):
             seen.add(key)
             if needs_follow_up(username, row["bureau"], row["account"]):
                 followups.append(row)
-        return followups
+
+    return followups
 
