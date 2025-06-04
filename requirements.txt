@@ -4,3 +4,4 @@ lob
 openai
 reportlab
 pdfplumber
+streamlit-authenticator
