@@ -28,9 +28,9 @@ hashed_passwords = ("sha256$eb9a57cced7399cc4c55b11c7c0f97d4227f0f9bc8a512b90e98
 
 credentials = {
     "usernames": {
-        usernames[0]: {
-            "name": names[0],
-            "password": hashed_passwords[0]
+        "melissa": {
+            "name": "Melissa Diaz",
+            "password": "sha256$eb9a57cced7399cc4c55b11c7c0f97d4227f0f9bc8a512b90e98a8be8f9c5cc6"
         }
     }
 }
@@ -42,7 +42,8 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=30
 )
 
-name, authentication_status, username = authenticator.login(name="Login", location="main")
+# ✅ Use positional args to avoid TypeError
+name, authentication_status, username = authenticator.login("Login", "main")
 
 if authentication_status is False:
     st.error("Incorrect username or password")
