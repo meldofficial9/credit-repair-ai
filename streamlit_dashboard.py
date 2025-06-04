@@ -22,7 +22,8 @@ names = ["Melissa Diaz"]
 usernames = ["melissa"]
 passwords = ["1234"]
 
-hashed_passwords = stauth.Hasher(passwords).generate()
+# Corrected: use stauth.hasher.Hasher, not stauth.Hasher
+hashed_passwords = stauth.hasher.Hasher(passwords).generate()
 
 authenticator = stauth.Authenticate(
     {"usernames": {
@@ -105,3 +106,4 @@ elif authentication_status:
         st.dataframe(pd.DataFrame(followups))
     else:
         st.info("✅ No follow-up disputes are due yet.")
+
