@@ -24,7 +24,7 @@ usernames = ["melissa"]
 passwords = ["1234"]
 
 # Hash passwords
-hashed_passwords = Hasher(passwords).generate()
+hashed_passwords = ("sha256$eb9a57cced7399cc4c55b11c7c0f97d4227f0f9bc8a512b90e98a8be8f9c5cc6")
 
 credentials = {
     "usernames": {
