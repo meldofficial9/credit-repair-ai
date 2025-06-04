@@ -1,6 +1,7 @@
-import openai
+from openai import OpenAI
+import os
 
-client = openai.OpenAI(api_key=openai.api_key)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_dispute_letter(account_name, reason):
     prompt = f"""
