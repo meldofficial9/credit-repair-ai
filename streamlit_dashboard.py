@@ -22,21 +22,27 @@ names = ["Melissa Diaz"]
 usernames = ["melissa"]
 passwords = ["1234"]
 
-# Correct usage: stauth.hasher.Hasher (lowercase h)
-hashed_passwords = ("sha256$eb9a57cced7399cc4c55b11c7c0f97d4227f0f9bc8a512b90e98a8be8f9c5cc6"
-)
+# Hash passwords using streamlit_authenticator's hasher
+hashed_passwords = stauth.hasher.Hasher(passwords).generate()
 
-authenticator = stauth.Authenticate(
-    {"usernames": {
+credentials = {
+    "usernames": {
         usernames[0]: {
             "name": names[0],
             "password": hashed_passwords[0]
         }
-    }},
-    "credit_app", "auth_token", cookie_expiry_days=30
+    }
+}
+
+authenticator = stauth.Authenticate(
+    credentials,
+    "credit_app",       # cookie name
+    "auth_token",       # key name
+    cookie_expiry_days=30
 )
 
-name, authentication_status, username = authenticator.login("Login", "main")
+# Use named arguments for login() to avoid errors
+name, authentication_status, username = authenticator.login(name="Login", location="main")
 
 if authentication_status is False:
     st.error("Incorrect username or password")
@@ -107,4 +113,3 @@ elif authentication_status:
         st.dataframe(pd.DataFrame(followups))
     else:
         st.info("✅ No follow-up disputes are due yet.")
-
