@@ -32,19 +32,22 @@ def send_certified_letter(bureau_name, pdf_path):
     if not to_address:
         raise ValueError("Invalid bureau name provided.")
 
-    letter = lob.letters.create(
-        description=f"Dispute Letter to {bureau_name}",
-        to_address=to_address,
-        from_address={
-            "name": "Melissa R Diaz Bravo",
-            "address_line1": "2053 Great Falls Way",
-            "address_city": "Orlando",
-            "address_state": "FL",
-            "address_zip": "32824"
-        },
-        file=open(pdf_path, 'rb'),
-        color=False,
-        mail_type="certified"
-    )
-
-    return letter["tracking_events_url"]
+    try:
+        letter = lob.letters.create(
+            description=f"Dispute Letter to {bureau_name}",
+            to_address=to_address,
+            from_address={
+                "name": "Melissa R Diaz Bravo",
+                "address_line1": "2053 Great Falls Way",
+                "address_city": "Orlando",
+                "address_state": "FL",
+                "address_zip": "32824"
+            },
+            file=open(pdf_path, 'rb'),
+            color=False,
+            mail_type="certified"
+        )
+        return letter["tracking_events_url"]
+    except Exception as e:
+        print("Lob API error:", e)
+        raise
