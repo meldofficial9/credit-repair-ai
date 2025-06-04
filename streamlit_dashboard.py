@@ -22,8 +22,7 @@ names = ["Melissa Diaz"]
 usernames = ["melissa"]
 passwords = ["1234"]
 
-# Corrected: use stauth.hasher.Hasher, not stauth.Hasher
-hashed_passwords = stauth.hasher.Hasher(passwords).generate()
+hashed_passwords = stauth.Hasher(passwords).generate()
 
 authenticator = stauth.Authenticate(
     {"usernames": {
