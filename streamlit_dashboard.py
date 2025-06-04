@@ -42,7 +42,7 @@ authenticator = stauth.Authenticate(
 
 # ✅ Use proper keyword arguments for login()
 # This is the correct call for older versions of streamlit-authenticator:
-name, authentication_status, username = authenticator.login("Login", "main")
+name, authentication_status, username = authenticator.login("Login", "sidebar")
 
 
 if authentication_status is False:
