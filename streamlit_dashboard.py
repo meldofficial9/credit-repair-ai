@@ -10,7 +10,12 @@ from generate_action_plan import get_dispute_items_with_retry
 from generate_letter import generate_dispute_letter
 from save_letter_pdf import save_letter_as_pdf
 from send_letter_lob import send_certified_letter
-from dispute_tracker import log_dispute, get_last_dispute_info, needs_follow_up
+from dispute_tracker import (
+    log_dispute,
+    get_last_dispute_info,
+    needs_follow_up,
+    get_all_followups
+)
 
 # ------------------------- AUTH -------------------------
 names = ["Melissa Diaz"]
@@ -37,7 +42,6 @@ elif authentication_status is None:
     st.warning("Please enter your credentials")
 elif authentication_status:
     authenticator.logout("Logout", "sidebar")
-
     st.title("Melissa's Credit Repair Assistant")
 
     # Step 1: Upload PDF and extract text
@@ -76,11 +80,11 @@ elif authentication_status:
             st.text(f"Reason: {reason}")
 
             if st.button(f"📬 Send dispute to {bureau} for {account}"):
-                info = get_last_dispute_info(bureau, account, username)
+                info = get_last_dispute_info(username, bureau, account)
                 round_num = 1
 
                 if info:
-                    if not needs_follow_up(bureau, account, username):
+                    if not needs_follow_up(username, bureau, account):
                         st.warning(f"⚠️ Already disputed (Round {info['round']}) on {info['date_sent'].strftime('%Y-%m-%d')}")
                         continue
                     round_num = info["round"] + 1
@@ -88,7 +92,7 @@ elif authentication_status:
                 letter = generate_dispute_letter(account, reason)
                 save_letter_as_pdf(letter)
                 tracking_url = send_certified_letter(bureau, "dispute_letter.pdf")
-                log_dispute(bureau, account, round_num, username)
+                log_dispute(username, bureau, account, round_num)
 
                 st.success(f"✅ Sent Round {round_num} dispute to {bureau} for {account}")
                 st.markdown(f"[Track your certified mail here]({tracking_url})")
@@ -96,20 +100,8 @@ elif authentication_status:
     # Step 4: Show upcoming follow-ups
     st.markdown("---")
     st.subheader("🕒 Pending Follow-Ups (30+ days old)")
-    tracker_file = f"disputes_{username}.csv"
-    if os.path.exists(tracker_file):
-        df = pd.read_csv(tracker_file)
-        followups = []
-        seen = set()
-        for _, row in df.iterrows():
-            key = (row["bureau"], row["account"])
-            if key in seen:
-                continue
-            seen.add(key)
-            if needs_follow_up(row["bureau"], row["account"], username):
-                followups.append(row)
-        if followups:
-            st.dataframe(pd.DataFrame(followups))
-        else:
-            st.info("✅ No follow-up disputes are due yet.")
-
+    followups = get_all_followups(username)
+    if followups:
+        st.dataframe(pd.DataFrame(followups))
+    else:
+        st.info("✅ No follow-up disputes are due yet.")
