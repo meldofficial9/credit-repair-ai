@@ -4,7 +4,6 @@ import json
 import pandas as pd
 from datetime import datetime
 import streamlit_authenticator as stauth
-from streamlit_authenticator import Hasher
 
 from extract_pdf import extract_text_from_pdf
 from generate_action_plan import get_dispute_items_with_retry
@@ -21,16 +20,15 @@ from dispute_tracker import (
 # ------------------------- AUTH -------------------------
 names = ["Melissa Diaz"]
 usernames = ["melissa"]
-passwords = ["1234"]
-
-# Hash passwords
-hashed_passwords = ("sha256$eb9a57cced7399cc4c55b11c7c0f97d4227f0f9bc8a512b90e98a8be8f9c5cc6")
+# Replace this with a hashed password you generated using Hasher
+# You already have it from earlier work: sha256$eb9a57...
+hashed_passwords = ["sha256$eb9a57cced7399cc4c55b11c7c0f97d4227f0f9bc8a512b90e98a8be8f9c5cc6"]
 
 credentials = {
     "usernames": {
-        "melissa": {
-            "name": "Melissa Diaz",
-            "password": "sha256$eb9a57cced7399cc4c55b11c7c0f97d4227f0f9bc8a512b90e98a8be8f9c5cc6"
+        usernames[0]: {
+            "name": names[0],
+            "password": hashed_passwords[0]
         }
     }
 }
@@ -42,8 +40,8 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=30
 )
 
-# ✅ Use positional args to avoid TypeError
-name, authentication_status, username = authenticator.login("Login", "main")
+# ✅ Use proper keyword arguments for login()
+name, authentication_status, username = authenticator.login(name="Login", location="main")
 
 if authentication_status is False:
     st.error("Incorrect username or password")
@@ -84,7 +82,7 @@ elif authentication_status:
             if not bureau or not account or not reason:
                 continue  # Skip incomplete entries
 
-            st.markdown(f"---")
+            st.markdown("---")
             st.markdown(f"### {account} ({bureau})")
             st.text(f"Reason: {reason}")
 
