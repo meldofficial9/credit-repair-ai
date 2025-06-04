@@ -4,6 +4,7 @@ import json
 import pandas as pd
 from datetime import datetime
 import streamlit_authenticator as stauth
+from streamlit_authenticator import Hasher
 
 from extract_pdf import extract_text_from_pdf
 from generate_action_plan import get_dispute_items_with_retry
@@ -22,8 +23,8 @@ names = ["Melissa Diaz"]
 usernames = ["melissa"]
 passwords = ["1234"]
 
-# Hash passwords using streamlit_authenticator's hasher
-hashed_passwords = stauth.hasher.Hasher(passwords).generate()
+# Hash passwords
+hashed_passwords = Hasher(passwords).generate()
 
 credentials = {
     "usernames": {
@@ -36,12 +37,11 @@ credentials = {
 
 authenticator = stauth.Authenticate(
     credentials,
-    "credit_app",       # cookie name
-    "auth_token",       # key name
+    cookie_name="credit_app",
+    key="auth_token",
     cookie_expiry_days=30
 )
 
-# Use named arguments for login() to avoid errors
 name, authentication_status, username = authenticator.login(name="Login", location="main")
 
 if authentication_status is False:
@@ -49,7 +49,7 @@ if authentication_status is False:
 elif authentication_status is None:
     st.warning("Please enter your credentials")
 elif authentication_status:
-    authenticator.logout("Logout", "sidebar")
+    authenticator.logout(name="Logout", location="sidebar")
     st.title("Melissa's Credit Repair Assistant")
 
     # Step 1: Upload PDF and extract text
